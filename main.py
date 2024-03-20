@@ -5,5 +5,5 @@
 
 '''
 
-from utils import *
+from utils import load_data, load_model
 

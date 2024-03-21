@@ -8,7 +8,7 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
-from keras.models import load_model
+from keras.models import load_model, Model
 from keras.utils import to_categorical
 from PIL import Image
 import numpy as np
@@ -19,13 +19,13 @@ LABELS = {
     "dicaprio":2
 }
 
-def load_model(fpath:str="./base_model.keras"):
+def load_my_model(fpath:str="./base_model.keras") -> Model:
     
     return load_model("fpath")
 
 
 
-def load(dir:str, shape:tuple=(224,224, 3)):
+def load(dir:str, shape:tuple=(224,224, 3)) -> tuple:
 
     # Loading dataset
     data = []
@@ -55,7 +55,7 @@ def load(dir:str, shape:tuple=(224,224, 3)):
     return np.array(data), to_categorical(labels)
 
 
-def load_data(path:str="./dataset"):
+def load_data(path:str="./dataset") -> tuple:
 
     train_data_path = os.path.join(path, "train_data")
     test_data_path = os.path.join(path, "test_data")

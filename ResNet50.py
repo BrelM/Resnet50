@@ -1,6 +1,8 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
+import pickle
+import keras
 from keras import Model
 from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
 from keras.initializers import glorot_uniform
@@ -58,7 +60,6 @@ def identity_block(X, f, filters, stage, block):
 
 
 #Implementation of ResNet-50
-
 def ResNet50(input_shape=(224, 224, 3)):
 
     X_input = Input(input_shape)
@@ -98,24 +99,70 @@ def ResNet50(input_shape=(224, 224, 3)):
     return model
 
 
+# @keras.saving.get_custom_objects().clear()
+
+# # Creatig a proper customr ResNet50 layer for serialization
+# @keras.saving.register_keras_serializable()
+# class ResNet50Class(keras.layers.Layer):
+    
+#     def __init__(self, nested_model:Model=None):
+#         super().__init__()
+#         self.nested_model = nested_model
+    
+#     def get_config(self):
+#         config = super().get_config()
+#         # Updation of config with custom layer's parameters
+#         for layer in self.nested_model.layers:
+#             config.update(
+#                 {
+#                     layer.name: None
+#                 }
+#             )
+
+#         return config
+    
+#     @classmethod
+#     def from_config(cls, config):
+#         return cls(**config)
+    
+#     def call(self, inputs):
+#         return self.nested_model(inputs)
+    
+
+    
+def create_model() -> Model:
+
+    # base_model = ResNet50Class(ResNet50(input_shape=(224, 224, 3))())
+    # x = base_model.nested_model.output
+    base_model = ResNet50(input_shape=(224, 224, 3))
+    x = base_model.output
+    x = Flatten()(x)
+    x = Dense(1024, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(512, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
+
+    model = Model(inputs=base_model.input, outputs=x)
+
+    # for layer in base_model.nested_model.layers:
+    #   layer.trainable = False
+
+    return model
+
+def save_model(model:Model):
+    
+    with open("base_model.keras", "wb") as model_file:
+        pickle.dump(model.get_weights(), model_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+# model.save("base_model.keras")
+
+def load_weights():
+    
+    with open("base_model.keras", "rb") as model_file:
+        return pickle.load(model_file)
+
+
+# save_model(create_model())
 
 
 
-
-
-
-base_model = ResNet50(input_shape=(224, 224, 3))
-x = base_model.output
-x = Flatten()(x)
-x = Dense(1024, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
-x = Dense(512, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
-x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
-
-model = Model(inputs=base_model.input, outputs=x)
-
-for layer in base_model.layers:
-  layer.trainable = False
-
-
-
-model.save("base_model.keras")
+    

@@ -7,26 +7,28 @@
 
 from utils import load_data, load_my_model
 from ResNet50 import create_model, load_weights, save_model
+from keras.callbacks import EarlyStopping
 
 
-print('Loading the model ...')
+print('\nLoading the model ...')
 model = create_model()
 
-print("Loading the model's weights ...")
+print("\nLoading the model's weights ...")
 model.set_weights(load_weights())
 
-print('Loading the dataset ...')
+print('\nLoading the dataset ...')
 (X_train, y_train), (X_test, y_test) = load_data()
 
-print('Compiling the model ...')
+print('\nCompiling the model ...')
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-print('Training the model ...')
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=3, shuffle=True)
+print('\nTraining the model ...')
+callback = EarlyStopping(monitor="accuracy", patience=10)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=30, shuffle=True, callbacks=[callback])
 
-print("End of training.")
+print("\nEnd of training.")
 
-print("Saving...")
+print("\nSaving...")
 save_model(model)
 
-print('Model saved.')
+print('\nModel saved.')

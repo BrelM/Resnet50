@@ -71,26 +71,26 @@ def ResNet50(input_shape=(224, 224, 3)):
     X = Activation('relu')(X)
     X = MaxPooling2D((3, 3), strides=(2, 2))(X)
 
-    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=2, block='a', s=1)
-    X = identity_block(X, 3, [64, 64, 256], stage=2, block='b')
-    X = identity_block(X, 3, [64, 64, 256], stage=2, block='c')
+    X = convolutional_block(X, f=3, filters=[16, 16, 64], stage=2, block='a', s=1)
+    X = identity_block(X, 3, [16, 16, 64], stage=2, block='b')
+    X = identity_block(X, 3, [16, 16, 64], stage=2, block='c')
 
 
-    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=3, block='a', s=2)
-    X = identity_block(X, 3, [128, 128, 512], stage=3, block='b')
-    X = identity_block(X, 3, [128, 128, 512], stage=3, block='c')
-    X = identity_block(X, 3, [128, 128, 512], stage=3, block='d')
+    X = convolutional_block(X, f=3, filters=[32, 32, 128], stage=3, block='a', s=2)
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='b')
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='c')
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='d')
 
-    X = convolutional_block(X, f=3, filters=[256, 256, 1024], stage=4, block='a', s=2)
-    X = identity_block(X, 3, [256, 256, 1024], stage=4, block='b')
-    X = identity_block(X, 3, [256, 256, 1024], stage=4, block='c')
-    X = identity_block(X, 3, [256, 256, 1024], stage=4, block='d')
-    X = identity_block(X, 3, [256, 256, 1024], stage=4, block='e')
-    X = identity_block(X, 3, [256, 256, 1024], stage=4, block='f')
+    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=4, block='a', s=2)
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='b')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='c')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='d')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='e')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='f')
 
-    X = convolutional_block(X, f=3, filters=[512, 512, 2048], stage=5, block='a', s=2)
-    X = identity_block(X, 3, [512, 512, 2048], stage=5, block='b')
-    X = identity_block(X, 3, [512, 512, 2048], stage=5, block='c')
+    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=5, block='a', s=2)
+    X = identity_block(X, 3, [128, 128, 512], stage=5, block='b')
+    X = identity_block(X, 3, [128, 128, 512], stage=5, block='c')
 
     X = AveragePooling2D(pool_size=(2, 2), padding='same')(X)
 
@@ -137,8 +137,8 @@ def create_model() -> Model:
     base_model = ResNet50(input_shape=(224, 224, 3))
     x = base_model.output
     x = Flatten()(x)
-    x = Dense(1024, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(512, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(512, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(256, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
     x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
 
     model = Model(inputs=base_model.input, outputs=x)

@@ -13,15 +13,25 @@ from keras.utils import to_categorical
 from PIL import Image
 import numpy as np
 
+
 LABELS = {
-    "brad":0,
-    "jolie":1,
-    "dicaprio":2
+    "Brel":0,
+    "Anselme":1,
+    "Rafiatou":2
 }
 
-def load_my_model(fpath:str="./base_model.keras") -> Model:
+
+# LABELS = {
+#     "brad":0,
+#     "dicaprio":1,
+#     "jolie":2
+# }
+
+REVERSED_LABELS = {_[0]:_[1] for _ in [(value, key) for key, value in LABELS.items()]}
+
+# def load_my_model(fpath:str="./base_model.keras") -> Model:
     
-    return load_model("fpath")
+#     return load_model("fpath")
 
 
 

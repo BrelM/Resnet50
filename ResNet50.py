@@ -2,7 +2,7 @@ import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 import pickle
-import keras
+# import keras
 from keras import Model
 from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
 from keras.initializers import glorot_uniform
@@ -143,8 +143,8 @@ def create_model() -> Model:
 
     model = Model(inputs=base_model.input, outputs=x)
 
-    # for layer in base_model.nested_model.layers:
-    #   layer.trainable = False
+    for layer in base_model.layers:
+        layer.trainable = False
 
     return model
 
@@ -157,7 +157,7 @@ def save_model(model:Model):
 
 def load_weights():
     
-    with open("base_model.keras", "rb") as model_file:
+    with open("base_model1.keras", "rb") as model_file:
         return pickle.load(model_file)
 
 

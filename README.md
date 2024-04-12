@@ -2,13 +2,29 @@
 
 ## Overview
 
-This Flutter project aims to develop a facial recognition application with the added feature of fingerprint recognition for enhanced security. The application utilizes a PyTorch model (`facial_recognition_by_me.pth`) to perform facial recognition, allowing users to capture images and predict the person's name along with their associated information. Additionally, the application will incorporate fingerprint recognition as an additional layer of authentication to ensure recognition accuracy.
+This Flutter project aims to develop a facial recognition application with the added feature of fingerprint recognition for enhanced security. The application utilizes a PyTorch model (`model.pth`), specifically the ResNet50 architecture, to perform facial recognition, allowing users to capture images and predict the person's name along with their associated information. Additionally, the application will incorporate fingerprint recognition as an additional layer of authentication to ensure recognition accuracy.
+
+## ResNet50 Architecture
+
+The ResNet50 architecture is a convolutional neural network (CNN) that consists of 50 layers. It employs residual connections, which help alleviate the vanishing gradient problem and enable training of very deep networks. Here's a brief overview of each component of the ResNet50 architecture:
+
+- **Convolutional Layers**: The network begins with a series of convolutional layers that extract features from the input images.
+
+- **Residual Blocks**: These blocks contain multiple convolutional layers with shortcut connections (skip connections). The skip connections allow gradients to flow more easily during training, enabling the network to learn deeper representations.
+
+- **Global Average Pooling**: After the convolutional layers, the network employs global average pooling to reduce the spatial dimensions of the features.
+
+- **Fully Connected Layer**: The output of the global average pooling layer is fed into a fully connected layer, which produces the final predictions.
+
+## Training Dataset
+
+The ResNet50 model used in this application was trained on a personal dataset consisting of data science students in the computer science department of the University of Yaounde I. The dataset is located at the following Google Drive address: [Google Drive Address](https://drive.google.com/your_dataset).
 
 ## Features
 
 - Facial Recognition:
     - Capture images of individuals.
-    - Utilize the pre-trained PyTorch model for facial recognition.
+    - Utilize the pre-trained PyTorch model (ResNet50) for facial recognition.
     - Predict the person's name and associated information.
 
 - Fingerprint Recognition:
@@ -51,7 +67,7 @@ This Flutter project aims to develop a facial recognition application with the a
 
 3. Capture an image of the individual whose identity you want to verify.
 
-4. The application will use the pre-trained PyTorch model to predict the person's name and associated information.
+4. The application will use the pre-trained PyTorch model (ResNet50) to predict the person's name and associated information.
 
 5. Optionally, enable the fingerprint recognition feature for enhanced security.
 

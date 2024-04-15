@@ -28,6 +28,7 @@ def detect_bounding_box(img):
     return img
 
 
+# While we don't explictly stop the loop
 while True:
 
     result, frame = webcam.read()

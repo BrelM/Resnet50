@@ -44,13 +44,14 @@ def load(dir:str, shape:tuple=(224,224, 3)) -> tuple:
     dir_content = os.listdir(dir)
 
     for _ in dir_content:
-        file = Image.open(os.path.join(dir, _)).resize((shape[0], shape[1]))
+        file = Image.open(os.path.join(dir, _)) # .resize((shape[0], shape[1]))
 
         temp_file = np.asarray(file)
         if file.size == (224, 224):
-            file.save(os.path.join(dir, _))
             file = temp_file
         else:
+            file = file.resize((shape[0], shape[1]))
+            file.save(os.path.join(dir, _))
             file = temp_file.reshape((1, shape[0], shape[1], shape[2]))
 
         # Adding the file

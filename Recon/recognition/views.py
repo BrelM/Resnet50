@@ -1,3 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 
-# Create your views here.
+
+
+
+def index(request):
+    return render(HttpResponse("Vous êtes à l'accueil", "recongnition/index.html"))
+
+
+
+def recognize(request):
+
+    if request.method == "POST":
+        image = request.FILES.get['image']
+
+        # Handle the file
+
+
+

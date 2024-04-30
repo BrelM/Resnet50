@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-*4__2fqf2l+)uw-d11+$eb+8pa26$h8p8rbxmtu9@b(2+p%*ys
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost"
+    "localhost",
+    "127.0.0.1"
 ]
 
 
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "recongnition.app.RecognitionConfig",
+    "recognition.apps.RecognitionConfig",
 ]
 
 MIDDLEWARE = [

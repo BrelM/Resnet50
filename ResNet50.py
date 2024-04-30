@@ -1,5 +1,6 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 
 import pickle
 # import keras

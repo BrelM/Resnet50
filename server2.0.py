@@ -1,14 +1,20 @@
 import cv2 as cv
-
+from PIL import Image
 from utils import load_data, REVERSED_LABELS
 from ResNet50 import create_model, load_weights
-from numpy import argmax, array, frombuffer
+from numpy import argmax, array, asarray
 
 import os
 from flask import Flask, request, send_from_directory
 
 
 
+
+print('\nLoading the model ...')
+model = create_model()
+
+print("\nLoading the model's weights ...")
+model.set_weights(load_weights())
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")
 
@@ -19,9 +25,14 @@ def detect_bounding_box(img):
 
     for (x, y, w, h) in faces:
         to_predict = array([cv.resize(img[y:y+h, x:x+w], (224, 224))])
-        prediction = argmax(model.predict(to_predict))
-        cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
-        cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
+        prediction = argmax(model.predict(to_predict, verbose=0))
+    
+        # cv.imshow("ezez", img[y:y+h, x:x+w])
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+
+        # cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        # cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
 
     return REVERSED_LABELS[prediction], img
 
@@ -51,9 +62,11 @@ def index():
     if request.method == 'POST':
         
         image = request.files.get('image')
-        # image.save(image.filename)
+        image.save(image.filename)
 
-        label, labeled_image = detect_bounding_box(frombuffer(image))
+        to_send = cv.imread(image.filename)
+
+        label, labeled_image = detect_bounding_box(to_send)
 
         return label
 
@@ -61,10 +74,4 @@ def index():
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080)
-    
-    print('\nLoading the model ...')
-    model = create_model()
-
-    print("\nLoading the model's weights ...")
-    model.set_weights(load_weights())
 

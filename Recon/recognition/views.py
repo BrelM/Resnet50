@@ -3,7 +3,8 @@ from django.shortcuts import render, HttpResponse
 import requests
 import os
 
-os.chdir(os.path.join(os.getcwd(), "Recon"))
+if not os.getcwd().lower().endswith('recon'):
+    os.chdir(os.path.join(os.getcwd(), "Recon"))
 
 
 def index(request):
@@ -29,7 +30,7 @@ def recognize(request):
 
             r = requests.post(url="http://127.0.0.1:8080", files=files)
             response = r.content.decode()
-            print(response)
+
         return render(request, "recognition/recognition.html", {"label": response})
 
 

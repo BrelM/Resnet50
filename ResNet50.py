@@ -1,6 +1,9 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-# os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
+#os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
+
+import tensorflow as tf
+tf.config.experimental.set_visible_devices([], 'GPU')
 
 import pickle
 # import keras

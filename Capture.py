@@ -20,12 +20,13 @@ def save_bounding_box(img, index):
             cv.resize(img[y:y+h, x:x+w], (224, 224))
         )
         cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        
     return img
 
 
 
 while True:
-    index = 30
+    index = 100
     for _ in range(index):
         result, frame = webcam.read()
         if not result:

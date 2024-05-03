@@ -7,7 +7,7 @@
 
 from utils import load_data
 from ResNet50 import create_model, load_weights, save_model
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 print('\nLoading the model ...')
@@ -23,8 +23,15 @@ print('\nCompiling the model ...')
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 print('\nTraining the model ...')
-callback = EarlyStopping(monitor="val_accuracy", patience=1)
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=30, shuffle=True, callbacks=[callback])
+
+# Callbacks
+filepath = "resnet50-{epoch:.2f}-loss-{loss:.2f}.keras"
+checkpoint = ModelCheckpoint(filepath, monitor="loss", verbose=1, save_best_only=True, mode='min')
+
+earlystop = EarlyStopping(monitor="val_accuracy", patience=2)
+callbacks_list = [checkpoint, earlystop]
+
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=30, shuffle=True, callbacks=callbacks_list)
 
 print("\nEnd of training.")
 

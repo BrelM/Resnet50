@@ -26,9 +26,9 @@ print('\nTraining the model ...')
 
 # Callbacks
 filepath = "resnet50-{epoch:.2f}-loss-{loss:.2f}.keras"
-checkpoint = ModelCheckpoint(filepath, monitor="loss", verbose=1, save_best_only=True, mode='min')
+checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode='min')
 
-earlystop = EarlyStopping(monitor="val_accuracy", patience=2)
+earlystop = EarlyStopping(monitor="val_accuracy", patience=3)
 callbacks_list = [checkpoint, earlystop]
 
 model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=30, shuffle=True, callbacks=callbacks_list)

@@ -5,7 +5,7 @@ from ResNet50 import create_model, load_weights
 from numpy import argmax, array, asarray
 
 import os
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_file
 
 
 
@@ -21,20 +21,27 @@ face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_front
 def detect_bounding_box(img):
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=6, minSize=(200, 200))
 
-    for (x, y, w, h) in faces:
-        to_predict = array([cv.resize(img[y:y+h, x:x+w], (224, 224))])
-        prediction = argmax(model.predict(to_predict, verbose=0))
-    
-        # cv.imshow("ezez", img[y:y+h, x:x+w])
-        # cv.waitKey(0)
+    try:
+        for (x, y, w, h) in faces:
+            to_predict = array([cv.resize(img[y:y+h, x:x+w], (224, 224))])
+            prediction = argmax(model.predict(to_predict, verbose=0))
+            
+            
+            cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
+        
+        # cv.imshow("ezez", cv.resize(img, (800, 800)))
+        # cv.waitKey(0)   
         # cv.destroyAllWindows()
+            
+        response = REVERSED_LABELS[prediction]
+    
+    except:
+        response = "The individual could not be recognised"
 
-        # cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
-        # cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
-
-    return REVERSED_LABELS[prediction], img
+    return response, img
 
 
 # create folder for uploaded data
@@ -62,11 +69,14 @@ def index():
     if request.method == 'POST':
         
         image = request.files.get('image')
-        image.save(image.filename)
+        image.save("images/" + image.filename)
 
-        to_send = cv.imread(image.filename)
-
+        to_send = cv.imread("images/" + image.filename)
         label, labeled_image = detect_bounding_box(to_send)
+
+        labeled_image.imwrite("images/" + image.filename)
+        
+
 
         return label
 

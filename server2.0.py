@@ -5,8 +5,9 @@ from ResNet50 import create_model, load_weights
 from numpy import argmax, array, asarray
 
 import os
-from flask import Flask, request, send_file
-
+import base64
+from flask import Flask, request
+from flask_json import FlaskJSON, json_response
 
 
 
@@ -21,7 +22,7 @@ face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_front
 def detect_bounding_box(img):
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=6, minSize=(200, 200))
+    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=4, minSize=(150, 150))
 
     try:
         for (x, y, w, h) in faces:
@@ -32,16 +33,14 @@ def detect_bounding_box(img):
             cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
             cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
         
-        # cv.imshow("ezez", cv.resize(img, (800, 800)))
-        # cv.waitKey(0)   
-        # cv.destroyAllWindows()
             
         response = REVERSED_LABELS[prediction]
     
     except:
         response = "The individual could not be recognised"
 
-    return response, img
+    
+    return response, cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
 
 # create folder for uploaded data
@@ -49,6 +48,7 @@ FOLDER = '.'
 os.makedirs(FOLDER, exist_ok=True)
 
 app = Flask(__name__)
+FlaskJSON(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -72,13 +72,21 @@ def index():
         image.save("images/" + image.filename)
 
         to_send = cv.imread("images/" + image.filename)
-        label, labeled_image = detect_bounding_box(to_send)
-
-        labeled_image.imwrite("images/" + image.filename)
+        label_, labeled_image = detect_bounding_box(to_send)
         
+        to_return = Image.fromarray(labeled_image)
+        to_return = base64.b64encode(to_return.tobytes()).decode()
+        
+        # to_return.show()
+        # cv.imshow("ezez", cv.resize(labeled_image, (700, 1000)))
+        # cv.waitKey(0)   
+        # cv.destroyAllWindows()
+        
+        # return send_file("images/" + image.filename)
 
 
-        return label
+        return json_response(label=label_, image=to_return, size=labeled_image.shape)
+
 
 
 

@@ -17,11 +17,11 @@ webcam = cv.VideoCapture(0)
 def detect_bounding_box(img):
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=6, minSize=(150, 150))
 
     for (x, y, w, h) in faces:
         to_predict = array([cv.resize(img[y:y+h, x:x+w], (224, 224))])
-        prediction = argmax(model.predict(to_predict))
+        prediction = argmax(model.predict(to_predict), verbose=0)
         cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
         cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
 

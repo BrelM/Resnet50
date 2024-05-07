@@ -12,7 +12,7 @@ webcam = cv.VideoCapture(0)
 def save_bounding_box(img, index):
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+    faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=4, minSize=(40, 40))
 
     for (x, y, w, h) in faces:
         cv.imwrite(

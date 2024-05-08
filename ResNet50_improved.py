@@ -161,11 +161,11 @@ def save_model(model:Model):
 
 def load_weights():
     
-    with open("base_model1.keras", "rb") as model_file:
+    with open("base_model.keras", "rb") as model_file:
         return pickle.load(model_file)
 
 
-save_model(create_model())
+# save_model(create_model())
 
 
 

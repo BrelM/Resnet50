@@ -20,7 +20,7 @@ import cv2 as cv
 LABELS = {
     "Brel":0,
     "Anselme":1,
-    "Rafiatou":2
+    "Emaha":2
 }
 
 

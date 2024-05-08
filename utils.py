@@ -20,7 +20,7 @@ import cv2 as cv
 LABELS = {
     "Brel":0,
     "Anselme":1,
-    "Rafiatou":2
+    "Emaha":2
 }
 
 
@@ -99,7 +99,8 @@ def load(dir:str, shape:tuple=(224,224)) -> tuple:
 
                 # Moving the old parent image
                 os.system("mkdir " + os.path.join(dir, "old_images").replace('/', '\\'))
-                os.system("move " + os.path.join(dir, _) + " " + os.path.join(os.path.join(dir, "old_images"), _).replace('/', '\\'))
+                # print(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
+                os.system(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
 
             else:
                 

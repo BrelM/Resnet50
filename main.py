@@ -6,7 +6,7 @@
 '''
 
 from utils import load_data
-from ResNet50 import create_model, load_weights, save_model
+from ResNet50_improved import create_model, load_weights, save_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 

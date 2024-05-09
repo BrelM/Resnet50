@@ -6,7 +6,7 @@
 '''
 
 from utils import load_data, REVERSED_LABELS
-from ResNet50 import create_model, load_weights
+from ResNet50_improved import create_model, load_weights
 from numpy import argmax
 
 print('\nLoading the model ...')

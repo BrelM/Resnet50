@@ -143,7 +143,7 @@ def create_model() -> Model:
     x = Flatten()(x)
     x = Dense(256, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
     x = Dense(128, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(33, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
 
     model = Model(inputs=base_model.input, outputs=x)
 
@@ -154,10 +154,10 @@ def create_model() -> Model:
 
 def save_model(model:Model):
     
-    with open("base_model.keras", "wb") as model_file:
-        pickle.dump(model.get_weights(), model_file, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open("base_model.keras", "wb") as model_file:
+    #     pickle.dump(model.get_weights(), model_file, protocol=pickle.HIGHEST_PROTOCOL)
 
-# model.save("base_model.keras")
+    model.save("base_model.keras")
 
 def load_weights():
     

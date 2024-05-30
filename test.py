@@ -5,15 +5,18 @@
 
 '''
 
+from keras.models import load_model
 from utils import load_data, REVERSED_LABELS
 from ResNet50_improved import create_model, load_weights
 from numpy import argmax
 
+
 print('\nLoading the model ...')
-model = create_model()
+# model = create_model()
 
 print("\nLoading the model's weights ...")
-model.set_weights(load_weights())
+# model.set_weights(load_weights())
+model = load_model("base_model.keras")
 
 print('\nLoading the dataset ...')
 (X_train, y_train), (X_test, y_test) = load_data()

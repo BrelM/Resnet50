@@ -10,25 +10,27 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 from keras.models import load_model, Model
 from keras.utils import to_categorical
+from keras.callbacks import Callback
+
 from PIL import Image
 import numpy as np
 import cv2 as cv
 
+from timeit import default_timer as timer
 
 
+labels_file = open("dataset/labels.data", "r")
+LABELS = {name:idx for idx, name in enumerate(labels_file.read().split('\n'))}
 
-LABELS = {
-    "Brel":0,
-    "Anselme":1,
-    "Emaha":2
-}
-
+labels_file.close()
 
 # LABELS = {
-#     "brad":0,
-#     "dicaprio":1,
-#     "jolie":2
+#     "Brel":0,
+#     "Anselme":1,
+#     "Emaha":2
 # }
+
+
 
 REVERSED_LABELS = {_[0]:_[1] for _ in [(value, key) for key, value in LABELS.items()]}
 
@@ -74,44 +76,45 @@ def load(dir:str, shape:tuple=(224,224)) -> tuple:
 
     dir_content = os.listdir(dir)
 
-    for _ in dir_content:
-        
-        if '.' in _: # If _ is actually a file
+    for person_folder in dir_content: # For each person's folder
+    
+        for _ in os.listdir(os.path.join(dir, person_folder)): # For face image in a person's folder
+            
+            if '.' in _: # If _ is actually a file
+                file = Image.open(os.path.join(dir, person_folder, _))
 
-            file = Image.open(os.path.join(dir, _))
+                # If the loaded image doesn't meet the shape standards (maybe not cropped yet) we do so,
+                # save the cropped version before adding to the dataset
+                if file.size != shape:
+                    # faces is a list consisting of Image objects of all the faces extrated in the current file 
+                    faces = save_bounding_box(file, os.path.join(dir, _), shape)
 
-            # If the loaded image doesn't meet the shape standards (maybe not cropped yet) we do so,
-            # save the cropped version before adding to the dataset
-            if file.size != shape:
-                # faces is a list consisting of Image objects of all the faces extrated in the current file 
-                faces = save_bounding_box(file, os.path.join(dir, _), shape)
+                    # Adding the face(s)
+                    for f in faces:
 
-                # Adding the face(s)
-                for f in faces:
+                        data.append(np.asarray(f))
+                    
+                        # Adding the label
+                        for key in LABELS.keys():
+                            if key in _:
+                                labels.append(LABELS[key])
+                                break
 
-                    data.append(np.asarray(f))
-                
+                    # Moving the old parent image
+                    os.system("mkdir " + os.path.join(dir, "old_images").replace('/', '\\'))
+                    # print(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
+                    os.system(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
+
+                else:
+                    
+                    # Adding the file
+                    data.append(np.asarray(file))
+                    
                     # Adding the label
                     for key in LABELS.keys():
-                        if key in _:
+                        if key.lower() == person_folder.lower() or person_folder.lower() in key.lower():
                             labels.append(LABELS[key])
                             break
-
-                # Moving the old parent image
-                os.system("mkdir " + os.path.join(dir, "old_images").replace('/', '\\'))
-                # print(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
-                os.system(('move "' + os.path.join(dir, _) + '" "' + os.path.join(dir, "old_images/")).replace('/', '\\') + '"')
-
-            else:
-                
-                # Adding the file
-                data.append(np.asarray(file))
-                
-                # Adding the label
-                for key in LABELS.keys():
-                    if key.lower() in _.lower():
-                        labels.append(LABELS[key])
-                        break
 
 
     return np.array(data), to_categorical(labels)
@@ -128,3 +131,21 @@ def load_data(path:str="./dataset") -> tuple:
     test_data = load(test_data_path)
 
     return train_data, test_data
+
+
+
+
+class TimingCallback(Callback):
+    
+    def __init__(self, logs={}):
+        self.logs = []
+
+    def on_epoch_begin(self, epoch, logs={}):
+        self.starttime = timer()
+    
+    def on_epoch_end(self, epoch, logs=None):
+        self.logs.append(timer() - self.starttime)
+
+    
+
+

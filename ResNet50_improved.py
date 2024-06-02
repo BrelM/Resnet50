@@ -7,6 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 # import keras
 from keras import Model
+from keras.models import load_model
 from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
 from keras.initializers import glorot_uniform
 
@@ -160,9 +161,10 @@ def save_model(model:Model):
     model.save("base_model.keras")
 
 def load_weights():
-    
-    with open("base_model.keras", "rb") as model_file:
-        return pickle.load(model_file)
+
+    return load_model("base_model.keras")
+    # with open("base_model.keras", "rb") as model_file:
+    #     return pickle.load(model_file)
 
 
 # save_model(create_model())

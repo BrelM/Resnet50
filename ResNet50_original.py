@@ -140,7 +140,7 @@ def create_model() -> Model:
     x = Flatten()(x)
     x = Dense(1024, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
     x = Dense(512, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(33, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
 
     model = Model(inputs=base_model.input, outputs=x)
 

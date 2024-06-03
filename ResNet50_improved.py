@@ -7,6 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 # import keras
 from keras import Model
+from keras.models import load_model
 from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
 from keras.initializers import glorot_uniform
 
@@ -75,25 +76,28 @@ def ResNet50(input_shape=(224, 224, 3)):
     X = MaxPooling2D((3, 3), strides=(2, 2))(X)
 
     X = convolutional_block(X, f=3, filters=[16, 16, 64], stage=2, block='a', s=1)
+    X = identity_block(X, 3, [16, 16, 64], stage=2, block='a')
     X = identity_block(X, 3, [16, 16, 64], stage=2, block='b')
     X = identity_block(X, 3, [16, 16, 64], stage=2, block='c')
-    X = identity_block(X, 3, [16, 16, 64], stage=2, block='d')
+    # X = identity_block(X, 3, [16, 16, 64], stage=2, block='d')
 
 
-    X = convolutional_block(X, f=3, filters=[32, 32, 128], stage=3, block='a', s=2)
+    X = convolutional_block(X, f=3, filters=[32, 32, 128], stage=3, block='b', s=2)
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='a')
     X = identity_block(X, 3, [32, 32, 128], stage=3, block='b')
-    X = identity_block(X, 3, [32, 32, 128], stage=3, block='c')
+    # X = identity_block(X, 3, [32, 32, 128], stage=3, block='c')
     # X = identity_block(X, 3, [32, 32, 128], stage=3, block='d')
 
-    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=4, block='a', s=2)
-    X = identity_block(X, 3, [64, 64, 256], stage=4, block='b')
+    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=4, block='c', s=2)
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='a')
+    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='b')
     # X = identity_block(X, 3, [64, 64, 256], stage=4, block='c')
     # X = identity_block(X, 3, [64, 64, 256], stage=4, block='d')
     # X = identity_block(X, 3, [64, 64, 256], stage=4, block='e')
     # X = identity_block(X, 3, [64, 64, 256], stage=4, block='f')
 
-    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=5, block='a', s=2)
-    # X = identity_block(X, 3, [128, 128, 512], stage=5, block='b')
+    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=5, block='d', s=2)
+    # X = identity_block(X, 3, [128, 128, 512], stage=5, block='a')
     # X = identity_block(X, 3, [128, 128, 512], stage=5, block='c')
 
     X = AveragePooling2D(pool_size=(2, 2), padding='same')(X)
@@ -141,9 +145,9 @@ def create_model() -> Model:
     base_model = ResNet50(input_shape=(224, 224, 3))
     x = base_model.output
     x = Flatten()(x)
-    x = Dense(256, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(128, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(3, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(300, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(150, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(33, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
 
     model = Model(inputs=base_model.input, outputs=x)
 
@@ -154,15 +158,16 @@ def create_model() -> Model:
 
 def save_model(model:Model):
     
-    with open("base_model.keras", "wb") as model_file:
-        pickle.dump(model.get_weights(), model_file, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open("base_model.keras", "wb") as model_file:
+    #     pickle.dump(model.get_weights(), model_file, protocol=pickle.HIGHEST_PROTOCOL)
 
-# model.save("base_model.keras")
+    model.save("base_model.keras")
 
 def load_weights():
-    
-    with open("base_model.keras", "rb") as model_file:
-        return pickle.load(model_file)
+
+    return load_model("base_model.keras")
+    # with open("base_model.keras", "rb") as model_file:
+    #     return pickle.load(model_file)
 
 
 # save_model(create_model())

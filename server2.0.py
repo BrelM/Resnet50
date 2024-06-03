@@ -12,10 +12,8 @@ from flask_json import FlaskJSON, json_response
 
 
 print('\nLoading the model ...')
-model = create_model()
-
 print("\nLoading the model's weights ...")
-model.set_weights(load_weights())
+model = load_weights()
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")
 

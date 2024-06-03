@@ -75,7 +75,6 @@ def recognize(request):
         
         final_image.save(file_path)
             
-        print(settings.MEDIA_ROOT, file_path)
         return render(request, "recognition/recognition.html", {"label": label, "src": "images/" + image.name})
     
     else:

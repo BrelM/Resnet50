@@ -36,7 +36,7 @@ checkpoint1 = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_
 # earlystop = EarlyStopping(monitor="val_accuracy", patience=1)
 callbacks_list = [checkpoint, checkpoint1, timer]#, earlystop]
 
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=200, shuffle=True, callbacks=callbacks_list)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=60, shuffle=True, callbacks=callbacks_list)
 
 print(f"\nEnd of training.\nThe training lasted: {sum(timer.logs)} s.")
 

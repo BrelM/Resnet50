@@ -12,8 +12,6 @@ from flask_json import FlaskJSON, json_response
 
 
 print('\nLoading the model ...')
-model = create_model()
-
 print("\nLoading the model's weights ...")
 #model.set_weights(load_weights())
 model=load_weights()
@@ -21,7 +19,13 @@ model=load_weights()
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")
 
-def detect_bounding_box(img):
+def detect_bounding_box(img:cv.Mat):
+
+    # Resizing output image if too big
+    ratio = 0.3
+    if img.shape[0] > 400 and img.shape[1] > 600:
+        img = cv.resize(img, (int(img.shape[1] * ratio), int(img.shape[0] * ratio)))
+
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     faces = face_classifier.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=4, minSize=(150, 150))
@@ -32,8 +36,8 @@ def detect_bounding_box(img):
             prediction = argmax(model.predict(to_predict, verbose=0))
             
             
-            cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
-            cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 10), cv.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0))
+            cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 16), cv.FONT_HERSHEY_COMPLEX_SMALL, 1.3, (0, 255, 0))
         
             
         response = REVERSED_LABELS[prediction]
@@ -41,7 +45,6 @@ def detect_bounding_box(img):
     except:
         response = "The individual could not be recognised"
 
-    
     return response, cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
 
@@ -75,7 +78,7 @@ def index():
 
         to_send = cv.imread("images/" + image.filename)
         label_, labeled_image = detect_bounding_box(to_send)
-        
+
         to_return = Image.fromarray(labeled_image)
         to_return = base64.b64encode(to_return.tobytes()).decode()
         

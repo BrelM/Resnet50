@@ -5,16 +5,18 @@
 
 '''
 
-from utils import load_data
+from utils import load_data, TimingCallback
+from keras.models import load_model
 from ResNet50_improved import create_model, load_weights, save_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 print('\nLoading the model ...')
-model = create_model()
+# model = create_model()
 
 print("\nLoading the model's weights ...")
-model.set_weights(load_weights())
+# model.set_weights(load_weights())
+model = load_model('base_model.keras')
 
 print('\nLoading the dataset ...')
 (X_train, y_train), (X_test, y_test) = load_data()
@@ -25,15 +27,18 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 print('\nTraining the model ...')
 
 # Callbacks
-filepath = "resnet50-{epoch:.2f}-loss-{loss:.2f}.keras"
-checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode='min')
+timer = TimingCallback()
+filepath = "resnet50-{epoch}-loss-{loss:.2f}-accuracy-{accuracy:.2f}-val_accuracy-{val_accuracy:.2f}.keras"
+checkpoint = ModelCheckpoint(filepath, monitor="accuracy", verbose=1, save_best_only=True, mode='max')
+checkpoint1 = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode='max')
 
-earlystop = EarlyStopping(monitor="val_accuracy", patience=3)
-callbacks_list = [checkpoint, earlystop]
 
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=30, shuffle=True, callbacks=callbacks_list)
+# earlystop = EarlyStopping(monitor="val_accuracy", patience=1)
+callbacks_list = [checkpoint, checkpoint1, timer]#, earlystop]
 
-print("\nEnd of training.")
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=200, shuffle=True, callbacks=callbacks_list)
+
+print(f"\nEnd of training.\nThe training lasted: {sum(timer.logs)} s.")
 
 print("\nSaving...")
 save_model(model)

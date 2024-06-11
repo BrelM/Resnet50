@@ -1,14 +1,16 @@
 import cv2 as cv
 
 from utils import load_data, REVERSED_LABELS
+from keras.models import load_model
 from ResNet50_improved import create_model, load_weights
 from numpy import argmax, array
 
 print('\nLoading the model ...')
-model = create_model()
+# model = create_model()
 
 print("\nLoading the model's weights ...")
-model.set_weights(load_weights())
+# model.set_weights(load_weights())
+model = load_model("base_model.keras")
 
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")

@@ -1,6 +1,6 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 # os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 
 
@@ -170,7 +170,7 @@ def load_weights():
     #     return pickle.load(model_file)
 
 
-save_model(create_model())
+# save_model(create_model())
 
 
 

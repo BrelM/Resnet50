@@ -116,7 +116,7 @@ def recognize(request):
 
             byte_image = base64.b64decode(response.get('image'))
 
-            final_image = Image.frombytes("RGB", size[:-1], byte_image, "raw")
+            final_image = Image.frombytes("RGB", size, byte_image, "raw")
             # final_image = Image.open(io.BytesIO(byte_image))
             
             final_image.save(file_path)

@@ -88,8 +88,6 @@ def recognize(request):
 
     if request.method == "POST":
 
-
-
         show_vote_button = True
 
         if 'image' in request.FILES:
@@ -123,6 +121,50 @@ def recognize(request):
             
             print(settings.MEDIA_ROOT, file_path)
             return render(request, "recognition/select_image.html", {"label": label, "src": "images/" + image.name,  "show_vote_button": show_vote_button})
+        
+        
+        
+        
+
+        if 'image' in request.POST:
+            
+
+            image_data = request.POST['image']
+            format, imgstr = image_data.split(';base64,')
+            ext = format.split('/')[-1]
+            img_data = base64.b64decode(imgstr)
+
+
+            file_name = "captured_image." + ext
+            file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
+            with open(file_path, "wb") as file:
+                file.write(img_data)
+
+            
+
+            # Handle the file
+            response = None
+            file = open(file_path, "rb")
+            files = {
+                'image': (file_name, file.read())
+            }
+
+            file.close()
+            r = requests.post(url="http://127.0.0.1:8080", files=files)
+            response = r.json()
+            
+            label = response.get('label')
+            size = response.get('size')
+
+            byte_image = base64.b64decode(response.get('image'))
+
+            final_image = Image.frombytes("RGB", size[:-1], byte_image, "raw")
+            # final_image = Image.open(io.BytesIO(byte_image))
+            
+            final_image.save(file_path)
+            
+            print(settings.MEDIA_ROOT, file_path)
+            return render(request, "recognition/select_image.html", {"label": label, "src": "images/" + file_name,  "show_vote_button": show_vote_button})
         
         
             

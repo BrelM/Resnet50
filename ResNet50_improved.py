@@ -8,7 +8,7 @@ import pickle
 # import keras
 from keras import Model
 from keras.models import load_model
-from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
+from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten, RandomRotation
 from keras.initializers import glorot_uniform
 
 
@@ -67,6 +67,9 @@ def identity_block(X, f, filters, stage, block):
 def ResNet50(input_shape=(224, 224, 3)):
 
     X_input = Input(input_shape)
+
+    # Data augmentation, clock-wise rotation
+    X = RandomRotation(-1)(X)
 
     X = ZeroPadding2D((3, 3))(X_input)
 

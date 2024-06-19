@@ -3,6 +3,7 @@ from PIL import Image
 from utils import load_data, REVERSED_LABELS
 from ResNet50_improved import create_model, load_weights
 from numpy import argmax, array
+from keras.layers import Dense
 
 import os
 import base64
@@ -15,6 +16,12 @@ print('\nLoading the model ...')
 print("\nLoading the model's weights ...")
 #model.set_weights(load_weights())
 model = load_weights()
+
+# Freezig Dense layers
+for layer in model.layers:
+    if isinstance(layer, Dense):
+        layer.trainable = False
+
 
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -33,8 +40,11 @@ def detect_bounding_box(img:cv.Mat):
     try:
         for (x, y, w, h) in faces:
             to_predict = array([cv.resize(img[y:y+h, x:x+w], (224, 224))])
-            prediction = argmax(model.predict(to_predict, verbose=0))
             
+            # Characteristics vector
+            prediction = model.predict(to_predict, verbose=0)
+            
+            #  
             
             cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
             cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 16), cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0))
@@ -83,13 +93,6 @@ def index():
         size = image.size
         image = base64.b64encode(image.tobytes()).decode()
         
-        # to_return.show()
-        # cv.imshow("ezez", cv.resize(labeled_image, (700, 1000)))
-        # cv.waitKey(0)   
-        # cv.destroyAllWindows()
-        
-        # return send_file("images/" + image.filename)
-
 
         return json_response(label=label_, image=image, size=size)
 

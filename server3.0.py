@@ -44,13 +44,7 @@ def detect_bounding_box(img:cv.Mat):
             # Characteristics vector
             prediction = model.predict(to_predict, verbose=0)
             
-            #  
-            
-            cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv.putText(img, REVERSED_LABELS[prediction], (x, y + h + 16), cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0))
-        
-            
-        response = REVERSED_LABELS[prediction]
+        response = prediction
     
     except:
         response = "The individual could not be recognised"
@@ -87,14 +81,16 @@ def index():
         image.save("images/" + image.filename)
 
         image = cv.imread("images/" + image.filename)
-        label_, image = detect_bounding_box(image)
+        char_vector, image = detect_bounding_box(image)
 
         image = Image.fromarray(image)
         size = image.size
         image = base64.b64encode(image.tobytes()).decode()
         
+        if not isinstance(char_vector, str):
+            char_vector = char_vector.tolist()
 
-        return json_response(label=label_, image=image, size=size)
+        return json_response(vector=char_vector, image=image, size=size)
 
 
 

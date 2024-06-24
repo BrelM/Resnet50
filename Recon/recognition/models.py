@@ -8,3 +8,4 @@ class Images(models.Model):
 class Nom(models.Model):
     nom = models.CharField(max_length=255)
     a_vote = models.BooleanField(default=False)
+    char = models.CharField(max_length=int(1e10), blank=True)

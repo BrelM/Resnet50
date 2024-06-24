@@ -1,16 +1,20 @@
 from django.shortcuts import render, HttpResponse, HttpResponse,get_object_or_404,redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.http import JsonResponse
+
 from .models import *
 from .forms import *
 from .models import Nom
 
-from django.conf import settings
 #from django.conf.urls.static import static
 
 import requests
 import os
 import base64
-import io
+from datetime import datetime
 from PIL import Image
+import json
 
 if not os.getcwd().lower().endswith('recon'):
     os.chdir(os.path.join(os.getcwd(), "Recon"))
@@ -47,6 +51,7 @@ def nom_detail(request, nom_id):
     return render(request, 'nom/detail.html', {'nom': nom})
 
 
+@csrf_exempt
 def recognize(request):
     show_vote_button = False
 
@@ -90,86 +95,147 @@ def recognize(request):
 
         show_vote_button = True
 
-        if 'image' in request.FILES:
-
-            image = request.FILES.get('image')
-
-            file_path = os.path.join(os.getcwd(), "recognition\static\images", image.name)
-            with open(file_path, "wb+") as file:    
-                file.write(image.read())
-
-            # Handle the file
-            response = None
-            file = open(file_path, "rb")
-            files = {
-                'image': (image.name, file.read())
-            }
-
-            file.close()
-            r = requests.post(url="http://127.0.0.1:8080", files=files)
-            response = r.json()
-            
-            label = response.get('label')
-            size = response.get('size')
-
-            byte_image = base64.b64decode(response.get('image'))
-
-            final_image = Image.frombytes("RGB", size, byte_image, "raw")
-            # final_image = Image.open(io.BytesIO(byte_image))
-            
-            final_image.save(file_path)
-            
-            print(settings.MEDIA_ROOT, file_path)
-            return render(request, "recognition/select_image.html", {"label": label, "src": "images/" + image.name,  "show_vote_button": show_vote_button})
+        # image = request.FILES.get('real-image')
+        # file_name = image.name
         
-        
-        
-        
+        data = request.body.decode('utf-8')
+        image_data = json.loads(data).get('image')
 
-        if 'image' in request.POST:
+        # Removing the header of the base64 string
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        # Decode the base64 string
+        img_data = base64.b64decode(imgstr)
+
+        # Creating an unique file name
+        file_name = f'snapshot_{datetime.now().strftime("%d%m%Y_%H%M%S")}.{ext}'
+
+        # Storing the image
+        file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
+        with open(file_path, "wb") as file:
+            file.write(img_data)
+ 
+
+        # Handle the file
+        response = None
+        file = open(file_path, "rb")
+        files = {
+            'image': (file_name, file.read())
+        }
+
+        file.close()
+        r = requests.post(url="http://127.0.0.1:8080", files=files)
+        response = r.json()
+        
+        char = response.get('vector') # vector is actually a tensor of floats (characteristics vector)
+        size = response.get('size')
+
+
+        label = "No matches found."
+        if not isinstance(char, str):
+            char = char[0]
+
+            # Checking compatibility with stored individuals
+            label, score = "", 1e3
             
+            for voter in Nom.objects.all():
+                # We simply evaluate the euclidian distance between stored voters' characteristics and the just-extracted ones.
+                calc = euclidian_dist(json.loads(voter.char), char)
+                if calc < score: # We store the most compatible voter 
+                    label, score = voter.nom, calc
 
-            image_data = request.POST['image']
-            format, imgstr = image_data.split(';base64,')
+
+
+        byte_image = base64.b64decode(response.get('image'))
+
+        final_image = Image.frombytes("RGB", size, byte_image, "raw")
+        # final_image = Image.open(io.BytesIO(byte_image))
+        
+        final_image.save(file_path)
+        
+        return JsonResponse({'status':'success', 'label': label})
+        # return render(request, "recognition/select_image.html", {"label": label, "src": "images/" + file_name,  "show_vote_button": show_vote_button})
+    
+    return render(request, "recognition/select_image.html")
+
+
+
+
+def register(request):
+    if request.method == "GET":
+        
+        return render(request, "recognition/register_individual.html")
+    
+    else:
+        
+        # Recupération de l'image et du l'étiquette de l'individu
+        image = request.FILES.get('image')
+        
+        if not image:
+            image = request.POST.get('image_input')
+
+            if not image:
+                return render(request, "recognition/register_individual.html", {"message":"An image shall be provided!", "error":True})
+
+
+            # Removing the header of the base64 string
+            format, imgstr = image.split(';base64,')
             ext = format.split('/')[-1]
+
+            # Decode the base64 string
             img_data = base64.b64decode(imgstr)
 
+            # Creating an unique file name
+            file_name = f'snapshot_{datetime.now().strftime("%d%m%Y_%H%M%S")}.{ext}'
 
-            file_name = "captured_image." + ext
-            file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
-            with open(file_path, "wb") as file:
-                file.write(img_data)
+
+        else:
+            img_data = image.read()
+            file_name = image.name
+
+
+
+        name = request.POST.get('name')
+
+        if not name:
+            return render(request, "recognition/register_individual.html", {"message":"A name shall be provided!", "error":True})
+
+
+        # Storing the image
+        file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
+        with open(file_path, "wb") as file:
+            file.write(img_data)
 
             
+        # Handle the file
+        response = None
+        file = open(file_path, "rb")
+        files = {
+            'image': (name, file.read())
+        }
 
-            # Handle the file
-            response = None
-            file = open(file_path, "rb")
-            files = {
-                'image': (file_name, file.read())
-            }
-
-            file.close()
-            r = requests.post(url="http://127.0.0.1:8080", files=files)
-            response = r.json()
-            
-            label = response.get('label')
-            size = response.get('size')
-
-            byte_image = base64.b64decode(response.get('image'))
-
-            final_image = Image.frombytes("RGB", size, byte_image, "raw")
-            # final_image = Image.open(io.BytesIO(byte_image))
-            
-            final_image.save(file_path)
-            
-            print(settings.MEDIA_ROOT, file_path)
-            return render(request, "recognition/select_image.html", {"label": label, "src": "images/" + file_name,  "show_vote_button": show_vote_button})
+        file.close()
+        r = requests.post(url="http://127.0.0.1:8080", files=files)
+        response = r.json()
         
-        
-            
+        char = response.get('vector') # vector is actually a tensor of floats (characteristics vector)
+        size = response.get('size')
 
-    return render(request, "recognition/select_image.html")
+        if not isinstance(char, str):
+            char = char[0]
+
+        # Sauvegarde du vecteur de caratéristiques
+        
+        Nom.objects.create(nom=name, char=json.dumps(char))
+
+        return render(request, "recognition/register_individual.html", {"message":"Individual successfully registered", "error":False})
+        
+
+
+
+
+
 
 
 '''def voter(request, label):
@@ -191,3 +257,25 @@ def recognize(request):
     return render(request, "recognition/select_image.html", { "label": label, "src": "images/" + image.name,  "show_vote_button": show_vote_button,"vote_message": vote_message})
   '''  
     
+
+
+def euclidian_dist(vect1:list, vect2:list) -> float:
+    '''
+        Compute the euclidian distance over two vector of floats.
+    '''
+
+    if len(vect1) != len(vect2):
+        raise ValueError(f"Lenght of the vectors should be the same. but vector 1 has lenght {len(vect1)} while vector 2 has lenght {len(vect2)}.")
+
+    v = 0
+    for _ in range(len(vect1)):
+        v += (vect1[_] - vect2[_])**2
+
+    return v ** 0.5
+
+
+
+
+
+
+

@@ -139,13 +139,23 @@ def recognize(request):
             # Checking compatibility with stored individuals
             label, score = "", 1e3
             
-            for voter in Nom.objects.all():
+            for elector in Nom.objects.all():
                 # We simply evaluate the euclidian distance between stored voters' characteristics and the just-extracted ones.
-                calc = euclidian_dist(json.loads(voter.char), char)
+                calc = euclidian_dist(json.loads(elector.char), char)
                 if calc < score: # We store the most compatible voter 
-                    label, score = voter.nom, calc
+                    label, score = elector.nom, calc
 
 
+        # If there's a match, procede to vote
+        if label != "No matches found.":
+            elector = Nom.objects.get(nom=label)
+            
+            if not elector.a_vote:
+                elector.a_vote = True
+                label = f"This individual is recognized as {label}. Status changed to 'already voted'."
+            else:
+                label = f"This individual is recognized as {label} and has already voted."
+        
 
         byte_image = base64.b64decode(response.get('image'))
 
@@ -207,7 +217,7 @@ def register(request):
         with open(file_path, "wb") as file:
             file.write(img_data)
 
-            
+
         # Handle the file
         response = None
         file = open(file_path, "rb")

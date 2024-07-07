@@ -28,7 +28,7 @@
 
 ### Launching the processing server and the web application
 
-* The back: 
+#### The back: 
 1. Install Miniconda3 (and make sure to accept the 'Add to the PATH' option)
 2. Open a terminal and execute the following commands:
 
@@ -39,7 +39,7 @@ python -m pip install pillow opencv-python Flask Flask-JSON numpy
 
 3. Type: python server3.0.py
 
-### The front: 
+#### The front: 
 1. Install python 3.12 and check 'Add to the PATH' 
 2. py install Django pillow
 3. Navigate to the project directory and execute: py Recon/manage.py runserver

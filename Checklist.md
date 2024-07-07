@@ -31,9 +31,9 @@
 1. Install Miniconda3 (and make sure to accept the 'Add to the PATH' option)
 2. Open a terminal and execute the following commands:
 
-conda create -n tf python=3.10
-conda activate tf
-python -m pip install path/to/tensorflow-2.10.0-cp310-cp310-win_amd64.whl
+conda create -n tf python=3.10 & 
+conda activate tf & 
+python -m pip install path/to/tensorflow-2.10.0-cp310-cp310-win_amd64.whl & 
 python -m pip install pillow opencv-python Flask Flask-JSON numpy
 
 3. Type: python server3.0.py

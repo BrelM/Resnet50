@@ -45,7 +45,7 @@
 (The web app can be accessed via http:127.0.0.1:8000)
 
 
-## Enrollment
+## Enrolment
 1. On the top right corner, click on  'Register and individual'
 For the following steps, make sure to be in a correctly lighted place and authorize the web application to use your webcam.
 You'll also have to stand right in front of the webcam in a straight position making sure your face is discernable.

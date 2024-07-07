@@ -36,19 +36,19 @@
 * python -m pip install path/to/tensorflow-2.10.0-cp310-cp310-win_amd64.whl
 * python -m pip install pillow opencv-python Flask Flask-JSON numpy
 
-3. Type: python server3.0.py
+3. Execute: python server3.0.py
 
 #### The front: 
 1. Install python 3.12 and check 'Add to the PATH' 
-2. py install Django pillow
+2. Execute: py install django pillow
 3. Navigate to the project directory and execute: py Recon/manage.py runserver
 (The web app can be accessed via http:127.0.0.1:8000)
 
 
 ## Enrollment
-1. On the top left corner, click on  'Register and individual'
-For the following steps, make sure to be in a correctly lighted place and Authorize the web application to use your webcam.
-You'll also have to stand right in front of the webcam in a straight position.
+1. On the top right corner, click on  'Register and individual'
+For the following steps, make sure to be in a correctly lighted place and authorize the web application to use your webcam.
+You'll also have to stand right in front of the webcam in a straight position making sure your face is discernable.
 
 2. In the page that displays, click 'Capture' or 'Choose File' buttons to provide a capture of your face.
 3. Enter your name in the text field below and then click 'Send'

@@ -41,7 +41,7 @@
 #### The front: 
 1. Install python 3.12 and check 'Add to the PATH' 
 2. Execute: py install django pillow
-3. Navigate to the project directory and execute: py Recon/manage.py runserver
+3. Navigate to the project root directory and execute: py Recon/manage.py runserver
 (The web app can be accessed via http:127.0.0.1:8000)
 
 

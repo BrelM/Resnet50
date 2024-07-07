@@ -26,25 +26,23 @@
 * Pillow 
 * Django
 
-## Launching the processing server and the web application
+### Launching the processing server and the web application
 
-1. The back: 
-* Install Miniconda3 (and make sure to accept the 'Add to the PATH' option)
-* Open a terminal and execute the following commands:
+* The back: 
+1. Install Miniconda3 (and make sure to accept the 'Add to the PATH' option)
+2. Open a terminal and execute the following commands:
 
 conda create -n tf python=3.10
 conda activate tf
 python -m pip install path/to/tensorflow-2.10.0-cp310-cp310-win_amd64.whl
 python -m pip install pillow opencv-python Flask Flask-JSON numpy
 
-* Type: python server3.0.py
+3. Type: python server3.0.py
 
-2. The front: 
-* Install python 3.12 and check 'Add to the PATH' 
-* py install Django pillow
-* Navigate to the project directory and execute: 
-py Recon/manage.py runserver
-
+### The front: 
+1. Install python 3.12 and check 'Add to the PATH' 
+2. py install Django pillow
+3. Navigate to the project directory and execute: py Recon/manage.py runserver
 (The web app can be accessed via http:127.0.0.1:8000)
 
 

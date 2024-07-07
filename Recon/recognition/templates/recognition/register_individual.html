@@ -1,0 +1,148 @@
+{% extends "recognition/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container emp-profile">
+    <form method="POST" action="{% url 'register' %}" class="needs-validation" enctype='multipart/form-data'>
+        {% csrf_token %}
+        <div class="d-flex justify-content-between my-6" style="background-color: rgb(255, 255, 255);">
+
+            <div class="col-md-4">
+                <h5 class="text-muted">Biometric Photo</h5><br>
+                <div>
+                    <div class="alert alert-warning">
+                        <svg width="1.0625em" height="1em" viewBox="0 0 17 16" class="bi bi-exclamation-triangle"
+                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M7.938 2.016a.146.146 0 0 0-.054.057L1.027 13.74a.176.176 0 0 0-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 0 0 .066-.017.163.163 0 0 0 .055-.06.176.176 0 0 0-.003-.183L8.12 2.073a.146.146 0 0 0-.054-.057A.13.13 0 0 0 8.002 2a.13.13 0 0 0-.064.016zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                            <path
+                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                        </svg>
+                        <small>Please use only biometric pictures</small>
+                    </div>
+                    
+                    <video id="camera-video" width="300%" autoplay></video>
+                    <canvas id="real-camera-canvas" width="3940" height="3100" style="display: none;"></canvas>
+                    <canvas id="camera-canvas" width="2440" height="1700" style="display: none;"></canvas>
+                    <img id="real-captured-image" name="real-captured-image" src="#" alt="" width="2440" height="1700" style="display: none;">
+                    <img id="captured-image" src="#" alt="" width="300%" style="display: none;">
+                </div>
+                <div class="mt-3">
+                    <input type="hidden" name="image" id="image">
+                    <button type="button" class="btn btn-outline-primary m-1" onclick="captureImage()">Capture</button>
+                    or
+                    <input type="file" name="image" id="image_input"><br><br>
+
+                    
+                    <input type="hidden" name="image_input" id="real-image">
+                    <input type="text" name="name" id="name" style="width:20em; border:solid #43BAFF 2px; border-radius:5px; padding:10px; font-color: #313436;" placeholder="Enter the individual's name">
+                    
+                    {% if message %}
+                        {% if error %}
+                            <div style="color:red">{{message}}</div>
+                        {% else %}
+                            <div style="color:green">{{message}}</div>
+                        {% endif %}
+                    {% endif %}
+                
+                </div>
+
+                <div class="mt-3">
+                    <!-- Use a hidden input field to store the captured image data -->
+                    <input type="hidden" name="image" id="image">
+                    <button type="submit" class="btn btn-outline-success m-1">Send</button>
+                    <a href="{% url 'home' %}"><button type="button" class="btn btn-outline-danger m-1">Cancel</button></a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+
+    const videoElement = document.getElementById('camera-video');
+
+    if (
+        !"mediaDevices" in navigator ||
+        !"getUserMedia" in navigator.mediaDevices
+    ) {
+        alert("Camera API is not available in your browser");
+    }
+
+    const constraints = {
+        video: {
+            width: {
+                min: 1280,
+                ideal: 1920,
+                max: 2560,
+            },
+            height: {
+                min: 720,
+                ideal: 1080,
+                max: 1440,
+            },
+        },
+    };
+
+    // use front face camera
+    let useFrontCamera = true;
+
+    // current video stream  
+    let videoStream;
+
+    // stop video stream
+    function stopVideoStream() {
+        if (videoStream) {
+            videoStream.getTracks().forEach((track) => {
+                track.stop();
+            });
+        }
+    }
+
+    // initialize
+    async function initializeCamera() {
+        stopVideoStream();
+        constraints.video.facingMode = useFrontCamera ? "user" : "environment";
+
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+            videoElement.srcObject = videoStream;
+            videoElement.play();
+        } catch (err) {
+            alert("Could not access the camera");
+        }
+    }
+
+    
+
+    function captureImage() {
+
+        const videoElement = document.getElementById('camera-video');
+        const canvasElement = document.getElementById('camera-canvas');
+        const realCanvasElement = document.getElementById('real-camera-canvas');
+        const context = canvasElement.getContext('2d');
+        const realContext = realCanvasElement.getContext('2d');
+
+        // Draw the current frame of the video on the canvas
+        const factor = 10
+        context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        realContext.drawImage(videoElement, 0, 0, realCanvasElement.width, realCanvasElement.height);
+
+        // Convert the canvas to a data URL and store it in the hidden input field
+        const imageData = canvasElement.toDataURL('image/jpeg');
+        const realImageData = realCanvasElement.toDataURL('image/jpeg');
+        document.getElementById('image').value = imageData;
+        document.getElementById('real-image').value = realImageData;
+
+        // Display the captured image and hide the video
+        const capturedImageElement = document.getElementById('captured-image');
+        capturedImageElement.src = imageData;
+        capturedImageElement.style.display = 'none';
+        videoElement.style.display = 'block';
+}
+
+    initializeCamera();
+</script>
+
+{% endblock content %}

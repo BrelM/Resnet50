@@ -1,0 +1,149 @@
+{% extends "recognition/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container emp-profile">
+    <form method="POST" action="{% url 'recognize' %}" class="needs-validation" enctype='multipart/form-data' id="id_form">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between my-6" style="background-color: rgb(255, 255, 255);">
+
+            <div class="col-md-4">
+                <h5 class="text-muted">Biometric Photo</h5><br>
+                <div>
+                    <div class="alert alert-warning">
+                        <svg width="1.0625em" height="1em" viewBox="0 0 17 16" class="bi bi-exclamation-triangle"
+                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M7.938 2.016a.146.146 0 0 0-.054.057L1.027 13.74a.176.176 0 0 0-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 0 0 .066-.017.163.163 0 0 0 .055-.06.176.176 0 0 0-.003-.183L8.12 2.073a.146.146 0 0 0-.054-.057A.13.13 0 0 0 8.002 2a.13.13 0 0 0-.064.016zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                            <path
+                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                        </svg>
+                        <small>Please use only biometric pictures</small>
+                    </div>
+                    
+                    <video id="camera-video" width="300%" autoplay></video>
+                    <canvas id="real-camera-canvas" width="3940" height="3100" style="display: none;"></canvas>
+                    <canvas id="camera-canvas" width="2440" height="1700" style="display: none;"></canvas>
+                    <img id="real-captured-image" name="real-captured-image" src="#" alt="" width="2440" height="1700" style="display: none;">
+                    <img id="captured-image" src="#" alt="" width="300%" style="display: none;">
+                </div>
+                <!--div class="mt-3">
+                    <button type="button" class="btn btn-outline-primary m-1" onclick="captureImage()">Capture</button>
+                    <!-- input type="file" name="image" id="image" -->
+                </div-->
+
+                <div class="mt-3">
+                    <!-- Use a hidden input field to store the captured image data -->
+                    <input type="hidden" name="image" id="image">
+                    <input type="hidden" name="real-image" id="real-image">
+                    <!--button type="submit" class="btn btn-outline-success m-1">Send</button-->
+                    <div id="label"></div>
+                    <a href="{% url 'home' %}"><button type="button" class="btn btn-outline-danger m-1">Cancel</button></a>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+            </div>
+
+            <!--div class="col-md-8">
+                <br>
+                <h1 class="text-primary">RESULT...</h1>
+                <br>
+                <div class="m-1">
+                    {% if label %}
+                    <img src="{% static src %}" alt="Resultat" class="img-fluid">
+                    <br><br>
+                    <h4>{{ label }}.</h4>
+                    <br><br>
+                    {% if show_vote_button %}
+                    <a class="btn btn-primary" href="{% url 'recognize' %}?label={{ label }}&src={{src }}">
+                        VOTER
+                    </a>   
+                    {% endif %}
+                    {% if vote_message %}
+                    <p class="text-success font-italic">{{ vote_message }}</p>
+                    {% endif %}
+                    {% endif %}
+                    <br>
+                </div>
+            </div-->
+        </div>
+    </form>
+</div>
+
+<script>
+    let videoStream;
+
+    document.addEventListener("DOMContentLoaded",
+    function() {
+    //function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                const videoElement = document.getElementById('camera-video');
+                videoElement.srcObject = stream;
+                videoElement.play();
+                videoStream = stream;
+
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'accès à la webcam :', error);
+            });
+        //}
+
+        function captureImage() {
+
+            const videoElement = document.getElementById('camera-video');
+            const canvasElement = document.getElementById('camera-canvas');
+            const realCanvasElement = document.getElementById('real-camera-canvas');
+            const context = canvasElement.getContext('2d');
+            const realContext = realCanvasElement.getContext('2d');
+
+            // Draw the current frame of the video on the canvas
+            const factor = 10
+            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+            realContext.drawImage(videoElement, 0, 0, realCanvasElement.width, realCanvasElement.height);
+
+            // Convert the canvas to a data URL and store it in the hidden input field
+            const imageData = canvasElement.toDataURL('image/jpeg');
+            const realImageData = realCanvasElement.toDataURL('image/jpeg');
+            document.getElementById('image').value = imageData;
+            document.getElementById('real-image').value = realImageData;
+
+            // Display the captured image and hide the video
+            const capturedImageElement = document.getElementById('captured-image');
+            capturedImageElement.src = imageData;
+            //capturedImageElement.style.display = 'none';
+            //videoElement.style.display = 'block';
+
+            // Real size image
+            const realCapturedImageElement = document.getElementById('real-captured-image');
+            realCapturedImageElement.src = realImageData;
+            
+            // Submitting snapshot
+            //document.getElementById('id_form').submit();
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/recognition/recognize/", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            //xhr.setRequestHeader("X-CSRFToken", document.getElementByName("csrfmiddlewaretoken").value);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log("Snapshot sent successfully:", xhr.responseText);
+                    const response = JSON.parse(xhr.responseText);
+                    document.getElementById('label').innerHTML = response.label;
+                }
+            };
+            const data = JSON.stringify({image:realImageData});
+            xhr.send(data);
+
+        }
+        
+        // Take a snapshot every 2 seconds
+        setInterval(captureImage, 3000);
+
+});
+
+    //startCamera();
+</script>
+
+{% endblock content %}

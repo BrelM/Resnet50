@@ -1,0 +1,108 @@
+{% extends "recognition/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<section id="team" class="team">
+
+    <div class="container" data-aos="fade-up">
+
+      <header class="section-header">
+
+        <nav id="navbar" class="navbar">
+          <ul>
+            
+            <li><a class="getstarted scrollto"  href="{% url 'home' %}">Go Home <i class="bi bi-arrow-right"></i></a></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i> 
+        </nav><!-- .navbar -->
+
+        <h2>ELECTION</h2>
+
+        <p> some voters</p>
+      </header>
+
+      <div class="row gy-4">
+
+        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
+          <div class="member">
+            <div class="member-img">
+              <img src="{% static 'img/team/clem.jpeg' %}" class="img-fluid" alt="">
+              <div class="social">
+                <a href=""><i class="bi bi-twitter"></i></a>
+                <a href=""><i class="bi bi-facebook"></i></a>
+                <a href=""><i class="bi bi-instagram"></i></a>
+                <a href=""><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+            <div class="member-info">
+              <h4>Emaha Clem</h4>
+              <span>Etudiante data Sciences</span>
+             <!-- <p>Velit aut quia fugit et et. Dolorum ea voluptate vel tempore tenetur ipsa quae aut. Ipsum exercitationem iure minima enim corporis et voluptate.</p>-->
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
+          <div class="member">
+            <div class="member-img">
+              <img src="{% static 'img/team/valere.jpeg' %}" class="img-fluid" alt="">
+              <div class="social">
+                <a href=""><i class="bi bi-twitter"></i></a>
+                <a href=""><i class="bi bi-facebook"></i></a>
+                <a href=""><i class="bi bi-instagram"></i></a>
+                <a href=""><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+            <div class="member-info">
+              <h4>Valere</h4>
+              <span>Etudiant data Sciences</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
+          <div class="member">
+            <div class="member-img">
+              <img src="{% static 'img/team/Harlette.jpeg' %}" class="img-fluid" alt="">
+              <div class="social">
+                <a href=""><i class="bi bi-twitter"></i></a>
+                <a href=""><i class="bi bi-facebook"></i></a>
+                <a href=""><i class="bi bi-instagram"></i></a>
+                <a href=""><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+            <div class="member-info">
+              <h4>Harlette</h4>
+              <span>Etudiante data Sciences</span>
+              
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
+          <div class="member">
+            <div class="member-img">
+              <img src="{% static 'img/team/baha.jpeg' %}" class="img-fluid" alt="">
+              <div class="social">
+                <a href=""><i class="bi bi-twitter"></i></a>
+                <a href=""><i class="bi bi-facebook"></i></a>
+                <a href=""><i class="bi bi-instagram"></i></a>
+                <a href=""><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+            <div class="member-info">
+              <h4>Bahaouddyn</h4>
+              <span>Etudiant data Sciences</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    
+
+  </section><!-- End Team Section -->
+
+  {% endblock content %}

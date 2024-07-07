@@ -3,15 +3,14 @@
 
 
 ## Hardware requirements:
-1. Windows 10 or above (the development was made on a Linux based environment but, the apps were designed to run on a user-friendly environment such as Windows)
-2. At least 4GB of RAM
-3. 1 GB of storage
-4. Internet access for web application style sheets loading
-5. A computer with a webcam and installed compatible drivers
+*. Windows 10 or above (the development was made on a Linux based environment but, the apps were designed to run on a user-friendly environment such as Windows)
+*. At least 4GB of RAM
+*. 1 GB of storage
+*. Internet access for web application style sheets loading
+*. A computer with a webcam and installed compatible drivers
 
 ## Software requirements
 1. A back-end that consists of a processing server running the model.
-
 * Miniconda3 environment 
 * Tensorflow version 2.10.0 
 * Pillow 

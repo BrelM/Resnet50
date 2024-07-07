@@ -144,8 +144,9 @@ def recognize(request):
                 calc = euclidian_dist(json.loads(elector.char), char)
                 if calc < score: # We store the most compatible voter 
                     label, score = elector.nom, calc
+            print(score)
 
-            if score > 0.3:
+            if score > 55:
                 label = "No matches found."
 
 

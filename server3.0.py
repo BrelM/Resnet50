@@ -1,9 +1,10 @@
 import cv2 as cv
 from PIL import Image
 from utils import load_data, REVERSED_LABELS
-from ResNet50_improved import create_model, load_weights
 from numpy import argmax, array
-from keras.layers import Dense
+from keras.models import load_model
+# from ResNet50_improved import create_model, load_weights
+# from keras.layers import Dense
 
 import os
 import base64
@@ -14,13 +15,14 @@ from flask_json import FlaskJSON, json_response
 
 print('\nLoading the model ...')
 print("\nLoading the model's weights ...")
+model = load_model("FExtractor.keras")
 #model.set_weights(load_weights())
-model = load_weights()
+# model = load_weights()
 
-# Freezig Dense layers
-for layer in model.layers:
-    if isinstance(layer, Dense):
-        layer.trainable = False
+# # Freezig Dense layers
+# for layer in model.layers:
+#     if isinstance(layer, Dense):
+#         layer.trainable = False
 
 
 

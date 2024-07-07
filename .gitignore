@@ -165,3 +165,4 @@ dataset/
 dataset_3_faces/
 base_model.keras
 base_model1.keras
+temp.py

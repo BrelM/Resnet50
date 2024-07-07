@@ -145,6 +145,9 @@ def recognize(request):
                 if calc < score: # We store the most compatible voter 
                     label, score = elector.nom, calc
 
+            if score > 0.3:
+                label = "No matches found."
+
 
         # If there's a match, procede to vote
         if label != "No matches found.":
@@ -152,10 +155,15 @@ def recognize(request):
             
             if not elector.a_vote:
                 elector.a_vote = True
-                label = f"This individual is recognized as {label}. Status changed to 'already voted'."
+                elector.save()
+                label = f"This individual is recognized as {label}. Status changed to 'already voted'.<br>Dissimilarity score: {score:.3f}"
+
+                # Unlock door for 3 seconds
+
             else:
-                label = f"This individual is recognized as {label} and has already voted."
-        
+                label = f"This individual is recognized as {label} and has already voted.<br>Dissimilarity score: {score:.3f}"
+
+                # Keep the door locked
 
         byte_image = base64.b64decode(response.get('image'))
 

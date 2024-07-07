@@ -52,6 +52,9 @@ def detect_bounding_box(img:cv.Mat):
     return response, cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
 
+
+
+
 # create folder for uploaded data
 FOLDER = '.'
 os.makedirs(FOLDER, exist_ok=True)

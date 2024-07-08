@@ -31,10 +31,10 @@ timer = TimingCallback()
 filepath = "resnet50-{epoch}-loss-{loss:.2f}-accuracy-{accuracy:.2f}-val_accuracy-{val_accuracy:.2f}.keras"
 checkpoint = ModelCheckpoint(filepath, monitor="accuracy", verbose=1, save_best_only=True, mode='max')
 checkpoint1 = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode='max')
+earlystop = EarlyStopping(monitor="val_accuracy", patience=10)
 
 
-# earlystop = EarlyStopping(monitor="val_accuracy", patience=1)
-callbacks_list = [checkpoint, checkpoint1, timer]#, earlystop]
+callbacks_list = [checkpoint, checkpoint1, timer, earlystop]
 
 model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, shuffle=True, callbacks=callbacks_list)
 

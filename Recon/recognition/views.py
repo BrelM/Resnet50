@@ -214,7 +214,6 @@ def register(request):
             file_name = image.name
 
 
-
         name = request.POST.get('name')
 
         if not name:
@@ -244,11 +243,13 @@ def register(request):
         if not isinstance(char, str):
             char = char[0]
 
-        # Sauvegarde du vecteur de caratéristiques
-        
-        Nom.objects.create(nom=name, char=json.dumps(char))
+            # Sauvegarde du vecteur de caratéristiques        
+            Nom.objects.create(nom=name, char=json.dumps(char))
 
-        return render(request, "recognition/register_individual.html", {"message":"Individual successfully registered", "error":False})
+            return render(request, "recognition/register_individual.html", {"message":"Individual successfully registered", "error":False})
+        
+        return render(request, "recognition/register_individual.html", {"message":"Failed to register the individual.The face was not clear enough.", "error":True})
+        
         
 
 

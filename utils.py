@@ -28,7 +28,7 @@ labels_file.close()
 REVERSED_LABELS = {_[0]:_[1] for _ in [(value, key) for key, value in LABELS.items()]}
 
 
-
+# Using poencv implemented HOG to extract facial regions
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")
 
 def save_bounding_box(img:Image.Image, path:str, shape:tuple):

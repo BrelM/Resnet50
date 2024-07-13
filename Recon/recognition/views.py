@@ -16,6 +16,8 @@ from datetime import datetime
 from PIL import Image
 import json
 
+THRESHOLD = 25
+
 if not os.getcwd().lower().endswith('recon'):
     os.chdir(os.path.join(os.getcwd(), "Recon"))
 
@@ -146,7 +148,7 @@ def recognize(request):
                     label, score = elector.nom, calc
             print(score)
 
-            if score > 55:
+            if score > THRESHOLD:
                 label = "No matches found."
 
 
@@ -242,7 +244,7 @@ def register(request):
 
         if not isinstance(char, str):
             char = char[0]
-
+        
             # Sauvegarde du vecteur de caratéristiques        
             Nom.objects.create(nom=name, char=json.dumps(char))
 

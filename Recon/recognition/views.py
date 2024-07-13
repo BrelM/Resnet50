@@ -114,7 +114,7 @@ def recognize(request):
         file_name = f'snapshot_{datetime.now().strftime("%d%m%Y_%H%M%S")}.{ext}'
 
         # Storing the image
-        file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
+        file_path = os.path.join(os.getcwd(), "recognition/static/images", file_name)
         with open(file_path, "wb") as file:
             file.write(img_data)
  
@@ -223,7 +223,7 @@ def register(request):
 
 
         # Storing the image
-        file_path = os.path.join(os.getcwd(), "recognition\static\images", file_name)
+        file_path = os.path.join(os.getcwd(), "recognition/static/images", file_name)
         with open(file_path, "wb") as file:
             file.write(img_data)
 
@@ -244,7 +244,7 @@ def register(request):
 
         if not isinstance(char, str):
             char = char[0]
-        
+
             # Sauvegarde du vecteur de caratéristiques        
             Nom.objects.create(nom=name, char=json.dumps(char))
 

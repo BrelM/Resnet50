@@ -3,20 +3,24 @@
 
     There will be used the saved model.
 
+
 '''
+import os
 
 from utils import load_data, TimingCallback
 from keras.models import load_model
+# from ResNet50_opt import create_model, load_weights, save_model
 from ResNet50_improved import create_model, load_weights, save_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 print('\nLoading the model ...')
 # model = create_model()
 
 print("\nLoading the model's weights ...")
-# model.set_weights(load_weights())
-model = load_model('base_model.keras')
+# model = load_model('base_model_opt.keras')
+model = load_weights()
 
 print('\nLoading the dataset ...')
 (X_train, y_train), (X_test, y_test) = load_data()

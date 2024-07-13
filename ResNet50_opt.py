@@ -6,9 +6,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import pickle
 # import keras
-from keras import Model
-from keras.models import load_model
-from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten, RandomRotation
+from keras.models import Model, load_model
+from keras.layers import Input, Conv2D, BatchNormalization, Activation, Add, ZeroPadding2D, MaxPooling2D, AveragePooling2D, Dense, Flatten
 from keras.initializers import glorot_uniform
 
 
@@ -68,10 +67,7 @@ def ResNet50(input_shape=(224, 224, 3)):
 
     X_input = Input(input_shape)
 
-    # Data augmentation, clockwise rotation
-    X = RandomRotation(1)(X_input)
-
-    X = ZeroPadding2D((3, 3))(X)
+    X = ZeroPadding2D((3, 3))(X_input)
 
     X = Conv2D(64, (7, 7), strides=(2, 2), name='conv1', kernel_initializer=glorot_uniform(seed=0))(X)
     X = BatchNormalization(axis=3, name='bn_conv1')(X)
@@ -79,69 +75,69 @@ def ResNet50(input_shape=(224, 224, 3)):
     X = MaxPooling2D((3, 3), strides=(2, 2))(X)
 
     X = convolutional_block(X, f=3, filters=[16, 16, 64], stage=2, block='a', s=1)
-    X = identity_block(X, 3, [16, 16, 64], stage=2, block='a')
     X = identity_block(X, 3, [16, 16, 64], stage=2, block='b')
     X = identity_block(X, 3, [16, 16, 64], stage=2, block='c')
-    # X = identity_block(X, 3, [16, 16, 64], stage=2, block='d')
 
 
-    X = convolutional_block(X, f=3, filters=[32, 32, 128], stage=3, block='b', s=2)
-    X = identity_block(X, 3, [32, 32, 128], stage=3, block='a')
+    X = convolutional_block(X, f=3, filters=[32, 32, 128], stage=3, block='a', s=2)
     X = identity_block(X, 3, [32, 32, 128], stage=3, block='b')
-    # X = identity_block(X, 3, [32, 32, 128], stage=3, block='c')
-    # X = identity_block(X, 3, [32, 32, 128], stage=3, block='d')
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='c')
+    X = identity_block(X, 3, [32, 32, 128], stage=3, block='d')
 
-    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=4, block='c', s=2)
-    X = identity_block(X, 3, [64, 64, 256], stage=4, block='a')
-    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='b')
-    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='c')
-    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='d')
-    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='e')
-    # X = identity_block(X, 3, [64, 64, 256], stage=4, block='f')
+    X = convolutional_block(X, f=3, filters=[64, 64, 256], stage=4, block='a', s=2)
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='b')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='c')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='d')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='e')
+    X = identity_block(X, 3, [64, 64, 256], stage=4, block='f')
 
-    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=5, block='d', s=2)
-    # X = identity_block(X, 3, [128, 128, 512], stage=5, block='a')
-    # X = identity_block(X, 3, [128, 128, 512], stage=5, block='c')
+    X = convolutional_block(X, f=3, filters=[128, 128, 512], stage=5, block='a', s=2)
+    X = identity_block(X, 3, [128, 128, 512], stage=5, block='b')
+    X = identity_block(X, 3, [128, 128, 512], stage=5, block='c')
 
-    X = AveragePooling2D(pool_size=(2, 2), padding='same')(X)
+
+    # Replacing the GAP with Flatten and Dense layers
+    # X = AveragePooling2D(pool_size=(2, 2), padding='same')(X)
+    x = Flatten()(x)
+    x = Dense(64, activation='relu', name='fc0',kernel_initializer=glorot_uniform(seed=0))(x)
+
 
     model = Model(inputs=X_input, outputs=X, name='ResNet50')
 
     return model
 
 
+
+
     
 def create_model() -> Model:
 
-
+    # base_model = ResNet50Class(ResNet50(input_shape=(224, 224, 3))())
+    # x = base_model.nested_model.output
     base_model = ResNet50(input_shape=(224, 224, 3))
     x = base_model.output
-    x = Flatten()(x)
-    x = Dense(300, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(150, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
-    x = Dense(33, activation='softmax', name='fc3',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(64, activation='relu', name='fc1',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(32, activation='relu', name='fc2',kernel_initializer=glorot_uniform(seed=0))(x)
+    x = Dense(33, activation='softmax', name='fc4',kernel_initializer=glorot_uniform(seed=0))(x)
 
     model = Model(inputs=base_model.input, outputs=x)
-
-    for layer in base_model.layers:
-        layer.trainable = False
+    print(model.summary())
+    # for layer in base_model.layers:
+    #     layer.trainable = False
 
     return model
 
 def save_model(model:Model):
+    
+    model.save("base_model_opt.keras")
 
-    model.save("base_model_imp.keras")
 
 def load_weights():
 
-    return load_model("base_model_imp.keras")
-
+    return  load_model("base_model_opt.keras")
 
 
 # save_model(create_model())
 
 
 
-
-
-    

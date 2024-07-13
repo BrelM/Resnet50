@@ -24,19 +24,9 @@ LABELS = {name:idx for idx, name in enumerate(labels_file.read().split('\n'))}
 
 labels_file.close()
 
-# LABELS = {
-#     "Brel":0,
-#     "Anselme":1,
-#     "Emaha":2
-# }
-
-
 
 REVERSED_LABELS = {_[0]:_[1] for _ in [(value, key) for key, value in LABELS.items()]}
 
-# def load_my_model(fpath:str="./base_model.keras") -> Model:
-    
-#     return load_model("fpath")
 
 
 face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_default.xml")

@@ -16,7 +16,7 @@ from datetime import datetime
 from PIL import Image
 import json
 
-THRESHOLD = 25
+THRESHOLD = 55
 
 if not os.getcwd().lower().endswith('recon'):
     os.chdir(os.path.join(os.getcwd(), "Recon"))
@@ -146,7 +146,7 @@ def recognize(request):
                 calc = euclidian_dist(json.loads(elector.char), char)
                 if calc < score: # We store the most compatible voter 
                     label, score = elector.nom, calc
-            print(score)
+            print(len(char))
 
             if score > THRESHOLD:
                 label = "No matches found."
@@ -252,33 +252,8 @@ def register(request):
         
         return render(request, "recognition/register_individual.html", {"message":"Failed to register the individual.The face was not clear enough.", "error":True})
         
-        
 
 
-
-
-
-
-
-'''def voter(request, label):
-     
-    nom = Nom.objects.get(nom=label)
-    image = request.session.get('image')
-    
-    # Vérifier si la personne a déjà voté
-    if not nom.a_vote:
-        nom.a_vote = True
-        nom.save()
-        
-        # Définir un message pour indiquer que le vote a été enregistré
-        vote_message = "Votre vote a été enregistré."
-    else:
-        vote_message = "Desolé, vous avez deja voté"
-    
-    #return redirect('liste_noms', extra_context={'vote_message': vote_message})
-    return render(request, "recognition/select_image.html", { "label": label, "src": "images/" + image.name,  "show_vote_button": show_vote_button,"vote_message": vote_message})
-  '''  
-    
 
 
 def euclidian_dist(vect1:list, vect2:list) -> float:

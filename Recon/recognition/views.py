@@ -9,6 +9,7 @@ from .models import Nom
 
 #from django.conf.urls.static import static
 
+import pickle
 import requests
 import os
 import base64
@@ -16,7 +17,13 @@ from datetime import datetime
 from PIL import Image
 import json
 
-THRESHOLD = 55
+
+
+
+THRESHOLD = 25
+path_to_voters_file = "../voters.data"
+
+
 
 if not os.getcwd().lower().endswith('recon'):
     os.chdir(os.path.join(os.getcwd(), "Recon"))
@@ -137,36 +144,80 @@ def recognize(request):
         label = "No matches found."
         if not isinstance(char, str):
             char = char[0]
+            features = char
+            with open(path_to_voters_file, "rb") as voters_file:
+                voters = pickle.Unpickler(voters_file).load()
+                
+                # Checking compatibility with stored individuals
+                name, status, error = "", "", 1e36
+                
+                for nam, stat in voters.items():
+                    # We simply evaluate the euclidian distance between stored voters' characteristics and the just-extracted ones.
+                    temp_error = euclidian_dist(features, stat["features"])
+                    if temp_error < error:
+                        name, status, error = nam, stat["voted"], temp_error
 
-            # Checking compatibility with stored individuals
-            label, score = "", 1e3
+                
+                # If there's a match, procede to vote
+                print(error)
+                if error < THRESHOLD:
+                    if not status:
+                        voters[name]["voted"] = True
+                        with open(path_to_voters_file, "wb") as voters_output:
+                            pickle.Pickler(voters_output).dump(voters)
+
+                        label = "The voter is recognized as {} with an error of {:2f}.\nStatus changed to 'Has voted'.".format(name, error)
+        
+                        # Unlock door for 3 seconds
+
+                    else:
+                        
+                        # For testing purpose only
+                        # voters[name]["voted"] = False
+                        # with open(path_to_voters_file, "wb") as voters_output:
+                        #     pickle.Pickler(voters_output).dump(voters)
+
+                        label = "The voter is recognized as {} with an error of {:2f} and has already voted.".format(name, error)
+        
+                        # Keep the door locked
+
+                
+                else:
+                    label = "No matches found."
+
+
+
+        #     # Checking compatibility with stored individuals
+        #     label, score = "", 1e3
             
-            for elector in Nom.objects.all():
-                # We simply evaluate the euclidian distance between stored voters' characteristics and the just-extracted ones.
-                calc = euclidian_dist(json.loads(elector.char), char)
-                if calc < score: # We store the most compatible voter 
-                    label, score = elector.nom, calc
-            print(len(char))
+        #     for elector in Nom.objects.all():
+        #         # We simply evaluate the euclidian distance between stored voters' characteristics and the just-extracted ones.
+        #         calc = euclidian_dist(json.loads(elector.char), char)
+        #         if calc < score: # We store the most compatible voter 
+        #             label, score = elector.nom, calc
+        #     print(len(char))
 
-            if score > THRESHOLD:
-                label = "No matches found."
+        #     if score > THRESHOLD:
+        #         label = "No matches found."
 
 
-        # If there's a match, procede to vote
-        if label != "No matches found.":
-            elector = Nom.objects.get(nom=label)
+        # # If there's a match, procede to vote
+        # if label != "No matches found.":
+        #     elector = Nom.objects.get(nom=label)
             
-            if not elector.a_vote:
-                elector.a_vote = True
-                elector.save()
-                label = f"This individual is recognized as {label}. Status changed to 'already voted'.<br>Dissimilarity score: {score:.3f}"
+        #     if not elector.a_vote:
+        #         elector.a_vote = True
+        #         elector.save()
+        #         label = f"This individual is recognized as {label}. Status changed to 'already voted'.<br>Dissimilarity score: {score:.3f}"
 
-                # Unlock door for 3 seconds
+        #         # Unlock door for 3 seconds
 
-            else:
-                label = f"This individual is recognized as {label} and has already voted.<br>Dissimilarity score: {score:.3f}"
+        #     else:
+        #         label = f"This individual is recognized as {label} and has already voted.<br>Dissimilarity score: {score:.3f}"
 
-                # Keep the door locked
+        #         # Keep the door locked
+
+
 
         byte_image = base64.b64decode(response.get('image'))
 
@@ -245,8 +296,24 @@ def register(request):
         if not isinstance(char, str):
             char = char[0]
 
-            # Sauvegarde du vecteur de caratéristiques        
-            Nom.objects.create(nom=name, char=json.dumps(char))
+            # Sauvegarde du vecteur de caratéristiques
+            # Nom.objects.create(nom=name, char=json.dumps(char))
+            default_name = name
+            features = char
+
+            try:    # If the file exists
+
+                with open(path_to_voters_file, "rb") as voters_file:
+                    voters = pickle.Unpickler(voters_file).load()
+                    voters[default_name] = {"features" : features, "voted" : False}
+
+                    with open(path_to_voters_file, "wb") as voters_output:
+                        pickle.Pickler(voters_output).dump(voters)
+
+            except:     # If the file doesn't exist yet
+                voters = {default_name : {"features" : features, "voted": False}}
+                with open(path_to_voters_file, "wb") as voters_output:
+                    pickle.Pickler(voters_output).dump(voters)
 
             return render(request, "recognition/register_individual.html", {"message":"Individual successfully registered", "error":False})
         

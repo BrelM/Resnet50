@@ -164,6 +164,5 @@ cython_debug/
 dataset/
 dataset_3_faces/
 base_model.keras
+voters.data
 base_model1.keras
-base_model_imp.keras
-base_model_opt.keras

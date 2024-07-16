@@ -30,7 +30,7 @@ face_classifier = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_front
 
 def detect_bounding_box(img:cv.Mat):
 
-    # Resizing output image if too big
+    # Resizing output image if too big. This is just in case the image is to big to be previewed
     ratio = 0.2
     if img.shape[0] > 400 and img.shape[1] > 600:
         img = cv.resize(img, (int(img.shape[1] * ratio), int(img.shape[0] * ratio)))

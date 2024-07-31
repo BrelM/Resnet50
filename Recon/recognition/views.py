@@ -166,7 +166,8 @@ def recognize(request):
                         with open(path_to_voters_file, "wb") as voters_output:
                             pickle.Pickler(voters_output).dump(voters)
 
-                        label = "The voter is recognized as {} with an error of {:2f}.\nStatus changed to 'Has voted'.".format(name, error)
+                        # label = "The voter is recognized as {} with an error of {:2f}.\nStatus changed to 'Has voted'.".format(name, error)
+                        label = "The voter is recognized as {}.\nStatus changed to 'Has voted'.".format(name)
         
                         # Unlock door for 3 seconds
 
@@ -177,7 +178,8 @@ def recognize(request):
                         # with open(path_to_voters_file, "wb") as voters_output:
                         #     pickle.Pickler(voters_output).dump(voters)
 
-                        label = "The voter is recognized as {} with an error of {:2f} and has already voted.".format(name, error)
+                        # label = "The voter is recognized as {} with an error of {:2f} and has already voted.".format(name, error)
+                        label = "The voter is recognized as {2f} and has already voted.".format(name)
         
                         # Keep the door locked
 
